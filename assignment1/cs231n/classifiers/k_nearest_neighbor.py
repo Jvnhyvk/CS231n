@@ -76,8 +76,6 @@ class KNearestNeighbor(object):
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-                # dists[i, j] = np.sqrt(np.sum((X[i, :] - self.X_train[j, :]) ** 2))
                 dists[i, j] = np.sqrt(np.sum(np.square((X[i, :] - self.X_train[j, :]))))
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -100,9 +98,14 @@ class KNearestNeighbor(object):
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            """
+            # Broadcasting with numpy.tile
+            test_data_tile = np.tile(X[i, :], (num_train,1))
+            dists[i, :] =   np.sqrt(np.sum(np.square((test_data_tile - self.X_train))))
+            """
 
-            pass
-
+            # Broadcasting without creating multiple copies
+            dists[i, :] = np.sqrt(np.sum(np.square((X[i,:] - self.X_train)),axis=1))
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -130,9 +133,7 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
-
+        dists = np.sqrt(np.sum(np.square(X),axis=1).reshape(-1,1) + np.sum(np.square(self.X_train),axis=1).reshape(1,-1) - 2 * np.matmul(X,np.transpose(self.X_train)))
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
