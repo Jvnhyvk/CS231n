@@ -83,10 +83,14 @@ def softmax_loss_vectorized(W, X, y, reg):
 
     num_classes = W.shape[1]
     num_train = X.shape[0]
-    scores = X.dot(W)
+    scores = X.dot(W) # (n,10)
     probs = np.exp(scores)
-    probs_sum = np.sum(probs)
-    probs /= probs_sum
+    probs_sum = np.sum(probs,axis=1)
+    probs /= probs_sum.reshape(-1,1)
+
+    coef = np.zeros_like(probs)
+    #coef[range(X.shape),y] = 1
+    #coef[range(X.shape),y] = 1 - coef[range(X.shape),y]
 
     """
     for i in range(num_train):
@@ -104,6 +108,7 @@ def softmax_loss_vectorized(W, X, y, reg):
 
         loss += -np.log(probs[y[i]])
     """
+    loss += np.sum(-np.log(probs[range(num_train),y]))
     loss /= num_train
     dW /= num_train
     # Add regularization to the loss.
