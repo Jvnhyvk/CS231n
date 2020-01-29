@@ -132,7 +132,8 @@ class TwoLayerNet(object):
 
         dX2 = np.dot(dscores,W2.T) # dscores (N,C) * W2.T (C,H) => X2 (N,H)
 
-        dH1 = np.where(H1 >= 0, 1, 0)
+        dH1 = np.copy(dX2)
+        dH1[X2 <= 0] = 0 # X2 (N,H)  H1 (N,H)
 
         db1 = np.sum(dH1,axis=0)
         dW1 = np.dot(X.T,dH1)
