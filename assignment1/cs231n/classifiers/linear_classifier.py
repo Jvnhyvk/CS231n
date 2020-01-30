@@ -107,7 +107,6 @@ class LinearClassifier(object):
         f = np.dot(X,self.W) # shape = (num_train, num_class)
         y_pred = np.argsort(f)[:,f.shape[1]-1]
 
-
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred
 

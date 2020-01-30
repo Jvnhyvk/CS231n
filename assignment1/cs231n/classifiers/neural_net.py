@@ -119,9 +119,11 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
         # Reference:
         # http://cs231n.github.io/neural-networks-case-study/
-        # https://hulk89.github.io/neural%20network/2017/01/12/SoftMax-NN/
+        # https://hulk89.github.io/neural%20network/2017/01/12/SoftMax-NN/ (Korean)
+
         dscores = np.copy(probs)
         dscores[range(N),y] -= 1 # (N, C)
         dscores /= N
@@ -187,7 +189,9 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            batch_indice = np.random.choice(range(num_train),batch_size,replace=True)
+            X_batch = X[batch_indice]
+            y_batch = y[batch_indice]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -203,7 +207,10 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.params['W1'] += -learning_rate * grads['W1']
+            self.params['b1'] += -learning_rate * grads['b1']
+            self.params['W2'] += -learning_rate * grads['W2']
+            self.params['b2'] += -learning_rate * grads['b2']
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -249,7 +256,9 @@ class TwoLayerNet(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        W1, b1, W2, b2 = self.params['W1'],self.params['b1'],self.params['W2'],self.params['b2']
+        f = np.dot(np.maximum(np.dot(X,W1) + b1,0), W2) + b2
+        y_pred = np.argsort(f)[:, f.shape[1] - 1]
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
