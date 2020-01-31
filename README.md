@@ -4,7 +4,7 @@
 
 Details about this assignment can be found [on the course webpage]
 
-* ### [Q1] (https://github.com/Jvnhyvk/CS231n/blob/master/assignment1/knn.ipynb): k-Nearest Neighbor classifier (Done)
+* ### [Q1](https://github.com/Jvnhyvk/CS231n/blob/master/assignment1/knn.ipynb): k-Nearest Neighbor classifier (Done)
 
 * ### Q2: Training a Support Vector Machine (Done)
 
