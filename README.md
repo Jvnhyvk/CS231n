@@ -4,15 +4,15 @@
 
 Details about this assignment can be found [on the course webpage]
 
-* ### Q1: k-Nearest Neighbor classifier (Complete)
+* ### [Q1] (https://github.com/Jvnhyvk/CS231n/blob/master/assignment1/knn.ipynb): k-Nearest Neighbor classifier (Done)
 
-* ### Q2: Training a Support Vector Machine (Complete)
+* ### Q2: Training a Support Vector Machine (Done)
 
-* ### Q3: Implement a Softmax classifier (Complete)
+* ### Q3: Implement a Softmax classifier (Done)
 
-* ### Q4: Two-Layer Neural Network (Complete).
+* ### Q4: Two-Layer Neural Network (Done)
 
-* ### Q5: Higher Level Representations: Image Features (Complete)
+* ### Q5: Higher Level Representations: Image Features (Done)
 
 ## Assignment 2
 
