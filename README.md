@@ -4,6 +4,8 @@
 
 Details about this assignment can be found [on the course webpage]
 
+* ### ㅁㄴㅇ
+
 ### * Q1: k-Nearest Neighbor classifier (Complete)
 
 ### * Q2: Training a Support Vector Machine (Complete)
