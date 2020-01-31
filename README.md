@@ -1,19 +1,27 @@
-# Assignment 1
+# CS231n: Convolutional Neural Networks for Visual Recognition Spring 2019 - Assignment Solutions
 
-Details about this assignment can be found [on the course webpage](http://cs231n.github.io/), under Assignment #1 of Spring 2019.
-http://cs231n.github.io/assignments2019/assignment1/
+## Assignment 1
 
-## Q1: k-Nearest Neighbor classifier (Complete)
-The IPython Notebook knn.ipynb will walk you through implementing the kNN classifier.
+Details about this assignment can be found [on the course webpage]
 
-## Q2: Training a Support Vector Machine (25 points)
-The IPython Notebook svm.ipynb will walk you through implementing the SVM classifier.
+### Q1: k-Nearest Neighbor classifier (Complete)
 
-## Q3: Implement a Softmax classifier (20 points)
-The IPython Notebook softmax.ipynb will walk you through implementing the Softmax classifier.
+### Q2: Training a Support Vector Machine (Complete)
 
-## Q4: Two-Layer Neural Network (25 points)
-The IPython Notebook two_layer_net.ipynb will walk you through the implementation of a two-layer neural network classifier.
+### Q3: Implement a Softmax classifier (Complete)
 
-## Q5: Higher Level Representations: Image Features (10 points)
-The IPython Notebook features.ipynb will walk you through this exercise, in which you will examine the improvements gained by using higher-level representations as opposed to using raw pixel values.
+### Q4: Two-Layer Neural Network (Complete).
+
+### Q5: Higher Level Representations: Image Features (Complete)
+
+## Assignment 2
+
+### Q1: Fully-connected Neural Network (20 points)
+
+### Q2: Batch Normalization (30 points)
+
+### Q3: Dropout (10 points)
+
+### Q4: Convolutional Networks (30 points)
+
+### Q5: PyTorch / TensorFlow on CIFAR-10 (10 points)
