@@ -1,4 +1,4 @@
-# Assignment 1
+# Assignment 2
 Details about this assignment can be found on the course webpage, under Assignment #2 of Spring 2019. http://cs231n.github.io/assignments2019/assignment2/
 
 ## Q1: Fully-connected Neural Network (20 points)
