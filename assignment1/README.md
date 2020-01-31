@@ -3,9 +3,6 @@
 Details about this assignment can be found [on the course webpage](http://cs231n.github.io/), under Assignment #1 of Spring 2019.
 http://cs231n.github.io/assignments2019/assignment1/
 
-* 안녕하세요
-** 
-
 ## Q1: k-Nearest Neighbor classifier (Complete)
 The IPython Notebook knn.ipynb will walk you through implementing the kNN classifier.
 
