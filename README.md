@@ -1,10 +1,9 @@
 # CS231n: Convolutional Neural Networks for Visual Recognition Spring 2019 - Assignment Solutions
+Details about this assignment can be found [on the course webpage](http://cs231n.github.io/)
 
-## Assignment 1
+## [Assignment 1](https://github.com/Jvnhyvk/CS231n/tree/master/assignment1)
 
-Details about this assignment can be found [on the course webpage]
-
-* ### [Q1](https://github.com/Jvnhyvk/CS231n/blob/master/assignment1/knn.ipynb): k-Nearest Neighbor classifier (Done)
+* ### Q1: k-Nearest Neighbor classifier (Done)
 
 * ### Q2: Training a Support Vector Machine (Done)
 
@@ -14,7 +13,7 @@ Details about this assignment can be found [on the course webpage]
 
 * ### Q5: Higher Level Representations: Image Features (Done)
 
-## Assignment 2
+## [Assignment 2](https://github.com/Jvnhyvk/CS231n/tree/master/assignment2)
 
 * ### Q1: Fully-connected Neural Network (20 points)
 
