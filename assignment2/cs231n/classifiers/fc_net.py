@@ -28,7 +28,7 @@ class TwoLayerNet(object):
         Initialize a new network.
 
         Inputs:
-        - input_dim: An integer giving the size of the input
+        - input_dim: An integer giving the size of the input - X = np.random.randn(N, D)
         - hidden_dim: An integer giving the size of the hidden layer
         - num_classes: An integer giving the number of classes to classify
         - weight_scale: Scalar giving the standard deviation for random
@@ -49,7 +49,15 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        W1 = np.random.normal(loc=0.0,scale=weight_scale,size=(input_dim,hidden_dim)) # z = np.dot(W1,x) + b1
+        b1 = np.zeros(hidden_dim)
+        W2 = np.random.normal(loc=0.0,scale=weight_scale,size=(hidden_dim,num_classes)) # f = np.dot(h1,W2) + b2
+        b2 = np.zeros(num_classes)
+
+        self.params['W1'] = W1
+        self.params['b1'] = b1
+        self.params['W2'] = W2
+        self.params['b2'] = b2
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -82,8 +90,21 @@ class TwoLayerNet(object):
         # class scores for X and storing them in the scores variable.              #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-        pass
+        """
+        X (N,D)
+        W1 (D,H)
+        b1 (H,)
+        
+        h  (N,H)
+        W2 (H,C)
+        b2 (C,)
+        """
+        N = X.shape[0]
+        W1, b1, W2, b2 = self.params['W1'], self.params['b1'], self.params['W2'], self.params['b2']
+        X = X.reshape(N,-1)
+        z = np.dot(X,W1) + b1
+        h = np.maximum(z,0)
+        scores = np.dot(h,W2) + b2
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -107,7 +128,42 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        probs = np.exp(scores)
+        probs_sum = np.sum(probs,axis=1)
+        probs /= probs_sum.reshape(-1,1)
+
+        correct_logprobs = -np.log(probs[range(N),y])
+        data_loss = np.sum(correct_logprobs)/N
+        reg_loss = 0.5 * self.reg * (np.sum(W1*W1) + np.sum(W2*W2))
+
+        loss = data_loss + reg_loss
+
+        dscores = np.copy(probs)
+        dscores[range(N),y] -= 1
+        dscores /= N
+
+        """
+        dscores (N,C)
+        h (N,H)
+        W2 (H,C)
+        """
+        dW2 = np.dot(h.T,dscores)
+        dh = np.dot(dscores, W2.T)
+        db2 = np.sum(dscores,axis=0)
+
+        dz = np.copy(dh)
+        dz[z < 0] = 0
+
+        dW1 = np.dot(X.T,dz)
+        db1 = np.sum(dz,axis=0)
+
+        dW1 += self.reg * W1
+        dW2 += self.reg * W2
+
+        grads['W2'] = dW2
+        grads['b2'] = db2
+        grads['W1'] = dW1
+        grads['b1'] = db1
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -178,7 +234,16 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        dims = hidden_dims.copy()
+        dims.append(num_classes)
+        idx = 1
+        in_dim = input_dim
+
+        for dim in dims:
+            out_dim = dim
+            self.params['W'+str(idx)] = np.random.normal(loc=0.0, scale=weight_scale, size=(in_dim, out_dim))
+            self.params['b'+str(idx)] = np.zeros(out_dim)
+            in_dim = dim
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
