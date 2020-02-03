@@ -101,10 +101,8 @@ class TwoLayerNet(object):
         """
         N = X.shape[0]
         W1, b1, W2, b2 = self.params['W1'], self.params['b1'], self.params['W2'], self.params['b2']
-        X = X.reshape(N,-1)
-        z = np.dot(X,W1) + b1
-        h = np.maximum(z,0)
-        scores = np.dot(h,W2) + b2
+        h,cache_h = affine_relu_forward(X,W1,b1)
+        scores,cache_scores = affine_forward(h,W2,b2)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -128,34 +126,13 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        probs = np.exp(scores)
-        probs_sum = np.sum(probs,axis=1)
-        probs /= probs_sum.reshape(-1,1)
-
-        correct_logprobs = -np.log(probs[range(N),y])
-        data_loss = np.sum(correct_logprobs)/N
+        data_loss,dscores = softmax_loss(scores,y)
         reg_loss = 0.5 * self.reg * (np.sum(W1*W1) + np.sum(W2*W2))
 
         loss = data_loss + reg_loss
 
-        dscores = np.copy(probs)
-        dscores[range(N),y] -= 1
-        dscores /= N
-
-        """
-        dscores (N,C)
-        h (N,H)
-        W2 (H,C)
-        """
-        dW2 = np.dot(h.T,dscores)
-        dh = np.dot(dscores, W2.T)
-        db2 = np.sum(dscores,axis=0)
-
-        dz = np.copy(dh)
-        dz[z < 0] = 0
-
-        dW1 = np.dot(X.T,dz)
-        db1 = np.sum(dz,axis=0)
+        dh,dW2,db2 = affine_backward(dscores,cache_scores)
+        dX,dW1,db1 = affine_relu_backward(dh,cache_h)
 
         dW1 += self.reg * W1
         dW2 += self.reg * W2
@@ -238,12 +215,12 @@ class FullyConnectedNet(object):
         dims.append(num_classes)
         idx = 1
         in_dim = input_dim
-
         for dim in dims:
             out_dim = dim
-            self.params['W'+str(idx)] = np.random.normal(loc=0.0, scale=weight_scale, size=(in_dim, out_dim))
-            self.params['b'+str(idx)] = np.zeros(out_dim)
+            self.params['W%d'%(idx)] = np.random.normal(loc=0.0, scale=weight_scale, size=(in_dim, out_dim))
+            self.params['b%d'%(idx)] = np.zeros(out_dim)
             in_dim = dim
+            idx += 1
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -305,8 +282,13 @@ class FullyConnectedNet(object):
         # layer, etc.                                                              #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        cache = {}
+        h, cache['h1'] = affine_relu_forward(X,self.params['W1'],self.params['b1'])
 
-        pass
+        for idx in range(self.num_layers - 2):
+            h,cache['h%d'%(idx+2)] = affine_relu_forward(h,self.params['W%d'%(idx+2)],self.params['b%d'%(idx+2)])
+
+        scores,cache['scores'] = affine_forward(h,self.params['W%d'%(self.num_layers)],self.params['b%d'%(self.num_layers)])
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -333,7 +315,23 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        data_loss, dscores = softmax_loss(scores, y)
+        reg_loss = 0.0
+        for idx in range(self.num_layers):
+            reg_loss += 0.5 * self.reg * (np.sum(self.params['W%d'%(idx+1)] ** 2))
+
+        loss = data_loss + reg_loss
+
+        dh, grads['W%d' %(self.num_layers)], grads['b%d' %(self.num_layers)] = affine_backward(dscores,cache['scores'])
+
+        for idx in range(self.num_layers-1,1,-1):
+            dh, grads['W%d' %(idx)], grads['b%d' %(idx)] = affine_relu_backward(dh, cache['h%d' %(idx)])
+
+        dx,grads['W1'],grads['b1'] = affine_relu_backward(dh,cache['h1'])
+
+        for idx in range(self.num_layers,0,-1):
+            grads['W%d' %(idx)] += self.reg * self.params['W%d'%(idx)]
+
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
