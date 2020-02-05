@@ -290,8 +290,12 @@ class FullyConnectedNet(object):
         cache = {}
         for idx in range(self.num_layers - 1):
             z, cache['z%d'%(idx+1)] = affine_forward(X,self.params['W%d'%(idx+1)],self.params['b%d'%(idx+1)])
-            if self.normalization:
+
+            if self.normalization == "batchnorm":
                 z, cache['bn%d'%(idx+1)] = batchnorm_forward(z, self.params['gamma%d'%(idx+1)],self.params['beta%d'%(idx+1)],self.bn_params[idx])
+            elif self.normalization == "layernorm":
+                z, cache['bn%d'%(idx+1)] = layernorm_forward(z, self.params['gamma%d'%(idx+1)],self.params['beta%d'%(idx+1)],self.bn_params[idx])
+
             h, cache['h%d'%(idx+1)] = relu_forward(z)
             X = h
 
@@ -332,8 +336,12 @@ class FullyConnectedNet(object):
 
         for idx in range(self.num_layers-1,0,-1):
             dh = relu_backward(dz,cache['h%d'%(idx)])
-            if self.normalization:
+
+            if self.normalization == "batchnorm":
                 dh, grads['gamma%d'%(idx)], grads['beta%d'%(idx)] = batchnorm_backward(dh,cache['bn%d'%(idx)])
+            elif self.normalization == "layernorm":
+                dh, grads['gamma%d'%(idx)], grads['beta%d'%(idx)] = layernorm_backward(dh,cache['bn%d'%(idx)])
+
             dz, grads['W%d' %(idx)], grads['b%d' %(idx)] = affine_backward(dh, cache['z%d'%(idx)])
 
         for idx in range(self.num_layers,0,-1):

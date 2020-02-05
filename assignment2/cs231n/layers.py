@@ -389,8 +389,14 @@ def layernorm_forward(x, gamma, beta, ln_param):
     # the batch norm code and leave it almost unchanged?                      #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    sample_mean = np.mean(x, axis=1).reshape(-1,1)
+    sample_var = np.var(x, axis=1).reshape(-1,1)
 
-    pass
+    x_hat = (x - sample_mean) / (np.sqrt(sample_var + eps))
+
+    out = gamma * x_hat + beta
+
+    cache = (x_hat, gamma, sample_mean, sample_var, eps, x)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -425,7 +431,18 @@ def layernorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x_hat, gamma, sample_mean, sample_var, eps, x = cache
+
+    N, D = x.shape
+
+    dgamma = np.sum(dout * x_hat, axis=0)
+    dbeta = np.sum(dout, axis=0)
+
+    dx_hat = dout * gamma
+
+    dvar = -0.5 * np.sum(dx_hat * (x - sample_mean), axis=1).reshape(-1,1) * np.power(sample_var + eps, -3 / 2)
+    dmean = np.sum(dx_hat, axis=1).reshape(-1,1) * -1 / (np.sqrt(sample_var + eps)) + dvar * -2.0 / D * np.sum((x - sample_mean), axis=1).reshape(-1,1)
+    dx = dx_hat * 1 / np.sqrt(sample_var + eps) + dvar * 2.0 / D * (x - sample_mean) + dmean / D
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
