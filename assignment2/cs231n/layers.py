@@ -581,8 +581,25 @@ def conv_forward_naive(x, w, b, conv_param):
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    N,C,H,W = x.shape
+    p = conv_param['pad']
+    stride = conv_param['stride']
+    F, C, HH, WW = w.shape
+    H_out = int(1 + (H+2*p-HH)/stride)
+    W_out = int(1 + (W+2*p-WW)/stride)
+    out = np.zeros((N,F,H_out,W_out),dtype=x.dtype)
+    print(x.shape)
+    x = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
+    print(x.shape)
+    """
+    for n in range(N):
+        for filter in range(w):
+                for h in range(p,H+1,stride):
+                    for w in range(p,W+1,stride):
+                        domain[h-1:h+2,w-1:w+2]
+    """
+    print(x.shape)
 
-    pass
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
