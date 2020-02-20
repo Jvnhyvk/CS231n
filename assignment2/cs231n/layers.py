@@ -588,18 +588,13 @@ def conv_forward_naive(x, w, b, conv_param):
     H_out = int(1 + (H+2*p-HH)/stride)
     W_out = int(1 + (W+2*p-WW)/stride)
     out = np.zeros((N,F,H_out,W_out),dtype=x.dtype)
-    print(x.shape)
-    x = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
-    print(x.shape)
-    """
-    for n in range(N):
-        for filter in range(w):
-                for h in range(p,H+1,stride):
-                    for w in range(p,W+1,stride):
-                        domain[h-1:h+2,w-1:w+2]
-    """
-    print(x.shape)
 
+    x_pad = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
+
+    for f in range(F):
+            for height in range(H_out):
+                for width in range(W_out):
+                    out[:,f,height,width] = np.sum(x_pad[:,:,height*stride:height*stride+HH,width*stride:width*stride+WW] * w[f], axis=(1,2,3)) + b[f]
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -622,13 +617,30 @@ def conv_backward_naive(dout, cache):
     - dw: Gradient with respect to w
     - db: Gradient with respect to b
     """
+    x, w, b, conv_param = cache
     dx, dw, db = None, None, None
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    # Reference:
+    # https://ratsgo.github.io/deep%20learning/2017/04/05/CNNbackprop/(Korean)
+    # https://metamath1.github.io/cnn/index.html (Korean)
+    # https://towardsdatascience.com/backpropagation-in-a-convolutional-layer-24c8d64d8509
+    p = conv_param['pad']
+    stride = conv_param['stride']
+    x_pad = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
+    """
+    - x: Input data of shape (N, C, H, W)
+    - w: Filter weights of shape (F, C, HH, WW)
+    - b: Biases, of shape (F,)
+    """
+    w_flip = np.flip(w,axis=(2,3))
+    dw = np.zeros_like(w)
+    dx = np.zeros_like(x_pad)
 
-    pass
+
+    db = np.sum(dout,axis=(0,2,3))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################

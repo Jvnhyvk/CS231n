@@ -2,7 +2,7 @@
 *.pyc
 .env/*
 */.ipynb_checkpoints/*
-/.idea
+.idea/
 
 # gitignore the built release.
 assignment3/*
