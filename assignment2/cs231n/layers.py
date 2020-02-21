@@ -590,7 +590,6 @@ def conv_forward_naive(x, w, b, conv_param):
     out = np.zeros((N,F,H_out,W_out),dtype=x.dtype)
 
     x_pad = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
-
     for f in range(F):
             for height in range(H_out):
                 for width in range(W_out):
@@ -627,18 +626,31 @@ def conv_backward_naive(dout, cache):
     # https://ratsgo.github.io/deep%20learning/2017/04/05/CNNbackprop/(Korean)
     # https://metamath1.github.io/cnn/index.html (Korean)
     # https://towardsdatascience.com/backpropagation-in-a-convolutional-layer-24c8d64d8509
+    # https://medium.com/@2017csm1006/forward-and-backpropagation-in-convolutional-neural-network-4dfa96d7b37e
+
     p = conv_param['pad']
     stride = conv_param['stride']
     x_pad = np.pad(x,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
-    """
-    - x: Input data of shape (N, C, H, W)
-    - w: Filter weights of shape (F, C, HH, WW)
-    - b: Biases, of shape (F,)
-    """
-    w_flip = np.flip(w,axis=(2,3))
-    dw = np.zeros_like(w)
-    dx = np.zeros_like(x_pad)
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    _,_,H_out,W_out = dout.shape
 
+    dx = np.zeros_like(x)
+    w_flip = np.flip(w,axis=(2,3))
+    dout_pad = np.pad(dout,((0,0),(0,0),(p,p),(p,p)),mode="constant",constant_values=0)
+
+    for n in range(N):
+        for f in range(F):
+            for height in range(H):
+                for width in range(W):
+                    dx[n,:,height,width] += np.sum(dout_pad[n,f,height*stride:height*stride+HH,width*stride:width*stride+WW] * w_flip[f],axis=(1,2))
+
+    dw = np.zeros_like(w)
+    for n in range(N):
+        for f in range(F):
+                for height in range(HH):
+                    for width in range(WW):
+                        dw[f,:,height,width] += np.sum(x_pad[n,:,height*stride:height*stride+H_out,width*stride:width*stride+W_out] * dout[n,f],axis=(1,2))
 
     db = np.sum(dout,axis=(0,2,3))
 
