@@ -54,8 +54,16 @@ class ThreeLayerConvNet(object):
         # the start of the loss() function to see how that happens.                #                           
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        C,H,W = input_dim
 
-        pass
+        self.params['W1'] = np.random.normal(loc = 0, scale = weight_scale,size = (num_filters,C,filter_size,filter_size))
+        self.params['b1'] = np.zeros(num_filters)
+
+        self.params['W2'] = np.random.normal(loc = 0,scale=weight_scale, size=(np.prod(input_dim),hidden_dim))
+        self.params['b2'] = np.zeros(hidden_dim)
+
+        self.params['W3'] = np.random.normal(loc = 0,scale = weight_scale, size = (hidden_dim,num_classes))
+        self.params['b3'] = np.zeros(num_classes)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -72,6 +80,17 @@ class ThreeLayerConvNet(object):
 
         Input / output: Same API as TwoLayerNet in fc_net.py.
         """
+
+        """
+        A three-layer convolutional network with the following architecture:
+
+        conv - relu - 2x2 max pool - affine - relu - affine - softmax
+
+        The network operates on minibatches of data that have shape (N, C, H, W)
+        consisting of N images, each with height H and width W and with C input
+        channels.
+        """
+
         W1, b1 = self.params['W1'], self.params['b1']
         W2, b2 = self.params['W2'], self.params['b2']
         W3, b3 = self.params['W3'], self.params['b3']
@@ -95,7 +114,12 @@ class ThreeLayerConvNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        out, cache = conv_relu_pool_forward(X,W1,b1, conv_param, pool_param)
+        print(X.shape,W1.shape)
+        print(out.shape,W2.shape)
+        out, cache = affine_relu_forward(out,W2,b2)
+        out, cache = affine_forward(out,W3,b3)
+        scores, cache = softmax_loss(out,y)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
