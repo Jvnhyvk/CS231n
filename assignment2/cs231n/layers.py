@@ -421,7 +421,7 @@ def layernorm_backward(dout, cache):
     - dgamma: Gradient with respect to scale parameter gamma, of shape (D,)
     - dbeta: Gradient with respect to shift parameter beta, of shape (D,)
     """
-    dx, dgamma, dbeta = None, None, None
+    dx, dgamm, dbeta = None, None, None
     ###########################################################################
     # TODO: Implement the backward pass for layer norm.                       #
     #                                                                         #
@@ -788,8 +788,16 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     # Your implementation should be very short; ours is less than five lines. #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    """
+    Reference:
+    # rolling axes and unrolling axes
+    https://github.com/haofeixu/stanford-cs231n-2018/blob/master/assignment2/cs231n/layers.py
+    """
+    N,C,H,W = x.shape
+    x_new = np.reshape(np.transpose(x,(0,2,3,1)),(-1,C))
+    out_new, cache = batchnorm_forward(x_new,gamma,beta,bn_param)
 
-    pass
+    out = np.transpose(np.reshape(out_new,(N,H,W,C)),(0,3,1,2))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -823,7 +831,12 @@ def spatial_batchnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N, C, H, W = dout.shape
+    dout_new = np.reshape(np.transpose(dout, (0, 2, 3, 1)), (-1, C))
+
+    dx_new,dgamma,dbeta = batchnorm_backward(dout_new,cache)
+
+    dx = np.transpose(np.reshape(dx_new, (N, H, W, C)), (0, 3, 1, 2))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -862,9 +875,44 @@ def spatial_groupnorm_forward(x, gamma, beta, G, gn_param):
     # and layer normalization!                                                # 
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    """
+    # Reference:
+    https://github.com/haofeixu/stanford-cs231n-2018/blob/master/assignment2/cs231n/layers.py#L822-L924
+    """
+    N, C, H, W = x.shape
+    x = np.reshape(x, (N * G, C // G * H * W))
 
-    pass
+    # Transpose x to use batchnorm code
+    x = x.T
 
+    # Just copy from batch normalization cdoe
+    mu = np.mean(x, axis=0)
+
+    xmu = x - mu
+    sq = xmu ** 2
+    var = np.var(x, axis=0)
+
+    sqrtvar = np.sqrt(var + eps)
+    ivar = 1. / sqrtvar
+    xhat = xmu * ivar
+
+    # Transform xhat and reshape
+    xhat = np.reshape(xhat.T, (N, C, H, W))
+    out = gamma[np.newaxis, :, np.newaxis, np.newaxis] * xhat + beta[np.newaxis, :, np.newaxis, np.newaxis]
+
+    cache = (xhat, gamma, xmu, ivar, sqrtvar, var, eps, G)
+
+    """
+    N,C,H,W = x.shape
+    x_reshaped = x.reshape((N*G,C//G*H*W))
+    sample_mean = np.mean(x_reshaped, axis=1).reshape(-1, 1)
+    sample_var = np.var(x_reshaped, axis=1).reshape(-1, 1)
+    x_hat = (x_reshaped - sample_mean) / (np.sqrt(sample_var + eps))
+    x_hat = x_hat.reshape((N,C,H,W))
+    out = gamma * x_hat + beta
+
+    cache = (x_hat, gamma, sample_mean, sample_var, eps, x, G)
+    """
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -892,8 +940,60 @@ def spatial_groupnorm_backward(dout, cache):
     # This will be extremely similar to the layer norm implementation.        #
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    """
+    # Reference:
+    https://github.com/haofeixu/stanford-cs231n-2018/blob/master/assignment2/cs231n/layers.py#L822-L924
+    """
+    N, C, H, W = dout.shape
 
-    pass
+    xhat, gamma, xmu, ivar, sqrtvar, var, eps, G = cache
+
+    dxhat = dout * gamma[np.newaxis, :, np.newaxis, np.newaxis]
+
+    # Set keepdims=True to make dbeta and dgamma's shape be (1, C, 1, 1)
+    dbeta = np.sum(dout, axis=(0, 2, 3), keepdims=True)
+    dgamma = np.sum(dout * xhat, axis=(0, 2, 3), keepdims=True)
+
+    # Reshape and transpose back
+    dxhat = np.reshape(dxhat, (N * G, C // G * H * W)).T
+    xhat = np.reshape(xhat, (N * G, C // G * H * W)).T
+
+    Nprime, Dprime = dxhat.shape
+
+    dx = 1.0 / Nprime * ivar * (Nprime * dxhat - np.sum(dxhat, axis=0) - xhat * np.sum(dxhat * xhat, axis=0))
+
+    dx = np.reshape(dx.T, (N, C, H, W))
+
+    """
+    N, C, H, W = dout.shape
+    x_hat, gamma, sample_mean, sample_var, eps, x, G = cache
+    size = (N*G,C//G,H,W)
+
+    dx_hat = dout * gamma
+    dx_hat = dx_hat.reshape(size)
+    dout = dout.reshape(size)
+    x_hat = x_hat.reshape(size)
+    x = x.reshape(size)
+
+    dgamma = np.sum(dout * x_hat, axis=0)
+    dbeta = np.sum(dout, axis=0)
+
+    D = C*H*W
+    print(dx_hat.shape)
+    print(x.shape)
+    print(sample_mean.shape)
+    print((x-sample_mean).shape)
+    print((dx_hat * (x - sample_mean)).shape)
+    print(np.sum(dx_hat * (x - sample_mean), axis=1).shape)
+    print(np.power(sample_var + eps, -3 / 2).shape)
+    dvar = -0.5 * np.sum(dx_hat * (x - sample_mean), axis=1).reshape(1, -1) * np.power(sample_var + eps, -3 / 2)
+    dmean = np.sum(dx_hat, axis=1).reshape(1, -1) * -1 / (np.sqrt(sample_var + eps))
+    temp = dvar * -2.0 / D * np.sum((x - sample_mean), axis=1).reshape(-1, 1)
+    dmean += temp
+    dx = dx_hat * 1 / np.sqrt(sample_var + eps) + dvar * 2.0 / D * (x - sample_mean) + dmean / D
+
+    dx = np.transpose(np.reshape(dx, (N,H,W,C),(0,3,1,2)))
+    """
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -910,7 +1010,7 @@ def svm_loss(x, y):
     - x: Input data, of shape (N, C) where x[i, j] is the score for the jth
       class for the ith input.
     - y: Vector of labels, of shape (N,) where y[i] is the label for x[i] and
-      0 <= y[i] < C
+z      0 <= y[i] < C
 
     Returns a tuple of:
     - loss: Scalar giving the loss
