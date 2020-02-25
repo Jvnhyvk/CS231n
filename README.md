@@ -15,12 +15,12 @@ Details about this assignment can be found [on the course webpage](http://cs231n
 
 ## [Assignment 2](https://github.com/Jvnhyvk/CS231n/tree/master/assignment2)
 
-* ### Q1: Fully-connected Neural Network (20 points)
+* ### Q1: Fully-connected Neural Network (Done)
 
-* ### Q2: Batch Normalization (30 points)
+* ### Q2: Batch Normalization (Done)
 
-* ### Q3: Dropout (10 points)
+* ### Q3: Dropout (Done)
 
-* ### Q4: Convolutional Networks (30 points)
+* ### Q4: Convolutional Networks (Done)
 
-* ### Q5: PyTorch / TensorFlow on CIFAR-10 (10 points)
+* ### Q5: PyTorch / TensorFlow on CIFAR-10 (Done)
