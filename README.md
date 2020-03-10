@@ -1,5 +1,6 @@
 # CS231n: Convolutional Neural Networks for Visual Recognition Spring 2019 - Assignment Solutions
 Details about this assignment can be found [on the course webpage](http://cs231n.github.io/)
+
 I used PyTorch for these assignments.
 
 ## [Assignment 1](https://github.com/Jvnhyvk/CS231n/tree/master/assignment1)
